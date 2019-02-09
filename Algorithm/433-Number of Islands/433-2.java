@@ -13,14 +13,14 @@ public class Solution {
         
         int R = grid.length;
         int C = grid[0].length;
-        UninFind uf = new UninFind(R * C);
+        UnionFind uf = new UnionFind(R * C);
         
         for (int r = 0; r < R; r++) {
             for (int c = 0; c < C; c++) {
                 if (!grid[r][c]) continue;
                 
                 int id = getId(r, c, grid);
-                uf.connect(id, id);
+                uf.union(id, id);
                 
                 for (int i = 0; i < dr.length; i++) {
                     int nr = r + dr[i];
@@ -28,7 +28,7 @@ public class Solution {
                     
                     if (isInside(nr, nc, grid) && grid[nr][nc]){
                         int nId = getId(nr, nc, grid);
-                        uf.connect(id, nId);
+                        uf.union(id, nId);
                     }
                 }
             }
@@ -49,12 +49,11 @@ public class Solution {
         return r >= 0 && c >= 0 && r < M && c < N;
     }
     
-    class UninFind {
-        
+    class UnionFind {
         int[] father;
         int count;
         
-        UninFind(int size){
+        UnionFind(int size){
             father = new int[size];
             Arrays.fill(father, -1);
             count = 0;
@@ -64,7 +63,7 @@ public class Solution {
             return count;
         }
         
-        public void connect(int a, int b) {
+        public void union(int a, int b) {
             if (a == b) {
                 count++;
             }
@@ -78,16 +77,14 @@ public class Solution {
         
         public int find(int id) {
             if (father[id] == -1) {
-                father[id] = id;
-                return id;
+                return father[id] = id;
             }
             
             if (father[id] == id) {
                 return id;
             }
             
-            father[id] = find(father[id]);
-            return father[id];
+            return father[id] = find(father[id]);
         }
-    }   
+    }
 }
