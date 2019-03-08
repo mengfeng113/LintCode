@@ -12,22 +12,16 @@ public class LRUCache {
         }
         
         void addNext(Node node) {
-            Node tmp = this.next;
-            this.next = node;
+            node.next = next;
             node.pre = this;
-            node.next = tmp;
-            if (tmp != null) {
-                tmp.pre = node;
-            }
+            next.pre = node;
+            next = node;
         }
         
         Node delete() {
-            Node pre = this.pre;
-            Node next = this.next;
-            if (pre != null)
-                pre.next = next;
-            if (next != null)
-                next.pre = pre;
+            pre.next = next;
+            next.pre = pre;
+            pre = next = null;
             return this;
         }
     }
@@ -35,6 +29,7 @@ public class LRUCache {
     class LRU<K, V> {
         private final int cacheSize;
         private final Map<K, Node<K, V>> map;
+        // Double linked list
         private final Node<K, V> head, tail;
         
         public LRU(int capacity) {
@@ -42,41 +37,37 @@ public class LRUCache {
             map = new HashMap<>();
             head = new Node<>(null, null);
             tail = new Node<>(null, null);
-            head.addNext(tail);
+            head.next = tail;
+            tail.pre = head;
         }
         
         public V get(K key) {
             // write your code here
-            if (map.containsKey(key)) {
-                Node<K, V> node = map.get(key);
-                addToFront(node);
-                return node.value;
+            if (!map.containsKey(key)) {
+                return null;
             }
-            return null;
+            Node<K, V> node = map.get(key);
+            node.delete();
+            head.addNext(node);
+            return node.value;
         }
         
         public void set(K key, V value) {
+            Node<K, V> node = null;
             if (map.containsKey(key)) {
-                Node<K, V> node = map.get(key);
+                node = map.get(key);
                 node.value = value;
-                addToFront(node);
+                node.delete();
             } else {
-                if (map.size() >= cacheSize) {
-                    map.remove(deleteFromBack().key);
-                }
-            
-                Node<K, V> node = new Node(key, value);
+                node = new Node(key, value);
                 map.put(key, node);
-                addToFront(node);
+                if (map.size() > cacheSize) {
+                    map.remove(tail.pre.key);
+                    tail.pre.delete();
+                }
             }
-        }
-        
-        private void addToFront(Node<K, V> node) {
-            head.addNext(node.delete());
-        }
-        
-        private Node<K, V> deleteFromBack() {
-            return tail.pre.delete();
+            
+            head.addNext(node);
         }
     }
     
@@ -85,8 +76,7 @@ public class LRUCache {
     
     /*
     * @param capacity: An integer
-    */
-    public LRUCache(int capacity) {
+    */public LRUCache(int capacity) {
         lru = new LRU<Integer, Integer>(capacity);
     }
 
@@ -106,5 +96,5 @@ public class LRUCache {
      */
     public void set(int key, int value) {
         lru.set(key, value);
-    }
+    }   
 }
