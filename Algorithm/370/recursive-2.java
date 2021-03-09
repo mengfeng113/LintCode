@@ -10,31 +10,34 @@ public class Solution {
             this.expression[i + 1] = expression[i]; 
         this.expression[this.expression.length - 1] = ")";
         index = 0;
-        return helper();
+        helper();
+        return res;
     }
 
     int index;
     String[] expression;
+    List<String> res = new LinkedList<>();
+    Stack<String> st = new Stack<>();
 
-    private List<String> helper() {
+    private void helper() {
         // evalue current level from index s in expression
         // expression[s] must be a "("
         // the current level ends on a ")"
         // after this helper is done, index should be 
         // pointing to the next token after the ")" 
         // which ends current level
-        List<String> res = new LinkedList<>();
-        Stack<String> st = new Stack<>();
+        
         index++;
+        st.push("("); // marked the beginning of current level
         while (!expression[index].equals(")")) {
             String token = expression[index];
             if (isNumber(token)) {
                 res.add(token);
                 index++;
             } else if (token.equals("(")) {
-                res.addAll(helper());
+                helper();
             } else { // an operator
-                while (!st.isEmpty() && prio(st.peek()) >= prio(token)) {
+                while (!st.peek().equals("(") && prio(st.peek()) >= prio(token)) {
                     res.add(st.pop());
                 }
                 st.push(token);
@@ -42,11 +45,11 @@ public class Solution {
             }
         }
 
-        while (!st.isEmpty()) {
+        while (!st.peek().equals("(")) {
             res.add(st.pop());
         }
+        st.pop(); // pop the "(" which marked the beginning of current level
         index++;
-        return res;
     }
 
     private boolean isNumber(String token) {
