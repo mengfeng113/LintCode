@@ -26,12 +26,12 @@ public class Solution {
         List<String> res = new LinkedList<>();
         Stack<String> st = new Stack<>();
         index++;
-        while (!expression[index].equals(")")) {
+        while (!")".equals(expression[index])) {
             String token = expression[index];
             if (isNumber(token)) {
                 res.add(token);
                 index++;
-            } else if (token.equals("(")) {
+            } else if ("(".equals(token)) {
                 res.addAll(helper());
             } else { // an operator
                 while (!st.isEmpty() && prio(st.peek()) >= prio(token)) {

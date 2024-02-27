@@ -29,12 +29,12 @@ public class Solution {
         
         index++;
         st.push("("); // marked the beginning of current level
-        while (!expression[index].equals(")")) {
+        while (!")".equals(expression[index])) {
             String token = expression[index];
             if (isNumber(token)) {
                 res.add(token);
                 index++;
-            } else if (token.equals("(")) {
+            } else if ("(".equals(token)) {
                 helper();
             } else { // an operator
                 while (!st.peek().equals("(") && prio(st.peek()) >= prio(token)) {
